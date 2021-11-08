@@ -1,12 +1,15 @@
 package com.onlym.converter.client;
 
+import com.onlym.converter.model.ConversionRequest;
+import com.onlym.converter.model.ConversionResponse;
 import com.onlym.converter.model.ExternalProviderResponseEntity;
+import com.onlym.converter.service.ConversionService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Component
-public class ConversionRateGetterClientDotIo {
+public class ConversionRateGetterClientDotIo implements ConversionRateGetterClient {
 
     private final WebClient client;
 
@@ -16,8 +19,8 @@ public class ConversionRateGetterClientDotIo {
         this.client = builder.baseUrl("http://api.exchangeratesapi.io").build();
     }
 
-    public Mono<ExternalProviderResponseEntity> getRates() {
-        return this.client
+    public Mono<ConversionResponse> getConversion(ConversionRequest conversionRequest) {
+        Mono<ExternalProviderResponseEntity> externalProviderResponseEntity = this.client
                 .get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")
                         .queryParam("access_key", API_KEY)
@@ -25,6 +28,8 @@ public class ConversionRateGetterClientDotIo {
                         .build())
                 .retrieve()
                 .bodyToMono(ExternalProviderResponseEntity.class);
+
+        return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
     }
 
 }

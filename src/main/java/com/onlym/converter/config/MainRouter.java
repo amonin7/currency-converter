@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
 @Configuration(proxyBeanMethods = false)
@@ -18,7 +19,10 @@ public class MainRouter {
     @Bean
     public RouterFunction<ServerResponse> route(ConversionHandler conversionHandler) {
         RequestPredicate route = GET("/rate").and(accept(MediaType.TEXT_PLAIN));
+        RequestPredicate currencyRoute = POST("/currency/convert")
+                .and(accept(MediaType.APPLICATION_JSON));
 
-        return RouterFunctions.route(route, conversionHandler::conversion);
+        return RouterFunctions.route(route, conversionHandler::convert)
+                .andRoute(currencyRoute, conversionHandler::convert);
     }
 }
