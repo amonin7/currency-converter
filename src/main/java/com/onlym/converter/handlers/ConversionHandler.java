@@ -14,12 +14,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class ConversionHandler {
 
-//    private final ConversionRateGetterClientDotIo client;
-//
-//    public ConversionHandler(ConversionRateGetterClientDotIo client) {
-//        this.client = client;
-//    }
-
     private final ConversionRateGetterClient client1;
     private final ConversionRateGetterClient client2;
 
