@@ -11,20 +11,24 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 @Component
 public class ConversionHandler {
 
-    private final ConversionRateGetterClient client1;
-    private final ConversionRateGetterClient client2;
+    private final List<ConversionRateGetterClient> clients;
+    private final Random rand = new Random();
 
-    public ConversionHandler(ConversionRateGetterClientDotCom client1, ConversionRateGetterClientDotIo client2) {
-        this.client1 = client1;
-        this.client2 = client2;
+    public ConversionHandler(ConversionRateGetterClientDotCom client0, ConversionRateGetterClientDotIo client1) {
+        clients = List.of(client0, client1);
     }
 
     public Mono<ServerResponse> convert(ServerRequest request) {
+        int clientIndex = rand.nextInt(2);
         Mono<ConversionRequest> conversionRequest = request.bodyToMono(ConversionRequest.class);
-        Mono<ConversionResponse> conversionResponse = conversionRequest.flatMap(this.client1::getConversion);
+        Mono<ConversionResponse> conversionResponse = conversionRequest.flatMap(this.clients.get(1)::getConversion);
 
         return ServerResponse
                 .ok()
