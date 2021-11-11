@@ -24,7 +24,6 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
     }
 
     public Mono<ConversionResponse> getConversion(ConversionRequest conversionRequest) throws InvalidClientException {
-//        try {
             Mono<ExternalProviderResponseEntity> externalProviderResponseEntity = this.client
                     .get()
                     .uri(uriBuilder -> uriBuilder.path("/latest")
@@ -45,9 +44,6 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
 //                    .onErrorReturn(new ExternalProviderResponseEntity());
 
             return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
-//        } catch (InvalidClientException ex) {
-//            throw ex;
-//        }
     }
 
 }

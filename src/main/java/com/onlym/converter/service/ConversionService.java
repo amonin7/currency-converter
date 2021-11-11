@@ -1,6 +1,5 @@
 package com.onlym.converter.service;
 
-import com.onlym.converter.exceptions.InvalidClientException;
 import com.onlym.converter.model.ConversionRequest;
 import com.onlym.converter.model.ConversionResponse;
 import com.onlym.converter.model.ExternalProviderResponseEntity;
