@@ -24,26 +24,26 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
     }
 
     public Mono<ConversionResponse> getConversion(ConversionRequest conversionRequest) throws InvalidClientException {
-            Mono<ExternalProviderResponseEntity> externalProviderResponseEntity = this.client
-                    .get()
-                    .uri(uriBuilder -> uriBuilder.path("/latest")
-                            .queryParam("access_key", API_KEY)
-                            .queryParam("base", "EUR")
-                            .build())
-                    .retrieve()
-                    .onStatus(HttpStatus::isError,
-                            clientResponse -> Mono.error(new InvalidClientException()))
-                    .bodyToMono(ExternalProviderResponseEntity.class)
-                    .flatMap(entity -> {
-                        if (!entity.isSuccess()) {
-                            return Mono.error(new InvalidClientException());
-                        } else {
-                            return Mono.just(entity);
-                        }
-                    });
-//                    .onErrorReturn(new ExternalProviderResponseEntity());
+        Mono<ExternalProviderResponseEntity> externalProviderResponseEntity = this.client
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/latest")
+                        .queryParam("access_key", API_KEY)
+                        .queryParam("base", "EUR")
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatus::isError,
+                        clientResponse -> Mono.error(new InvalidClientException()))
+                .bodyToMono(ExternalProviderResponseEntity.class)
+                .flatMap(entity -> {
+                    if (!entity.isSuccess()) {
+                        return Mono.error(new InvalidClientException());
+                    } else {
+                        return Mono.just(entity);
+                    }
+                });
+//                .onErrorReturn(new ExternalProviderResponseEntity());
 
-            return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
+        return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
     }
 
 }
