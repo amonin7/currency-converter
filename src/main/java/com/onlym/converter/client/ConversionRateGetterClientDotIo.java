@@ -41,7 +41,6 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
                         return Mono.just(entity);
                     }
                 });
-//                .onErrorReturn(new ExternalProviderResponseEntity());
 
         return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
     }

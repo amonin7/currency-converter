@@ -7,15 +7,17 @@ public class ExternalProviderResponseEntity {
     private String base;
     private String date;
     private HashMap<String, Double> rates;
+    private String result;
     private boolean success;
 
     public ExternalProviderResponseEntity() {
     }
 
-    public ExternalProviderResponseEntity(String base, String date, HashMap<String, Double> rates, boolean success) {
+    public ExternalProviderResponseEntity(String base, String date, HashMap<String, Double> rates, String result, boolean success) {
         this.base = base;
         this.date = date;
         this.rates = rates;
+        this.result = result;
         this.success = success;
     }
 
@@ -49,5 +51,13 @@ public class ExternalProviderResponseEntity {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

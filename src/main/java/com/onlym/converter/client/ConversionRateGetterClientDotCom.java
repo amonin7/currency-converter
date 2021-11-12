@@ -1,9 +1,11 @@
 package com.onlym.converter.client;
 
+import com.onlym.converter.exceptions.InvalidClientException;
 import com.onlym.converter.model.ConversionRequest;
 import com.onlym.converter.model.ConversionResponse;
 import com.onlym.converter.model.ExternalProviderResponseEntity;
 import com.onlym.converter.service.ConversionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -23,7 +25,16 @@ public class ConversionRateGetterClientDotCom implements ConversionRateGetterCli
                 .uri(uriBuilder -> uriBuilder.path("/v6/latest/" + conversionRequest.getFrom())
                         .build())
                 .retrieve()
-                .bodyToMono(ExternalProviderResponseEntity.class);
+                .onStatus(HttpStatus::isError,
+                        clientResponse -> Mono.error(new InvalidClientException()))
+                .bodyToMono(ExternalProviderResponseEntity.class)
+                .flatMap(entity -> {
+                    if (!entity.getResult().equals("success")) {
+                        return Mono.error(new InvalidClientException());
+                    } else {
+                        return Mono.just(entity);
+                    }
+                });
 
         return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
     }

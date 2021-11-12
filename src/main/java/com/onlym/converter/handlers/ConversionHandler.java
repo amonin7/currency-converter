@@ -3,17 +3,16 @@ package com.onlym.converter.handlers;
 import com.onlym.converter.client.ConversionRateGetterClient;
 import com.onlym.converter.client.ConversionRateGetterClientDotCom;
 import com.onlym.converter.client.ConversionRateGetterClientDotIo;
-import com.onlym.converter.exceptions.InvalidClientException;
 import com.onlym.converter.model.ConversionRequest;
 import com.onlym.converter.model.ConversionResponse;
+import com.onlym.converter.model.ErrorConversionResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -33,12 +32,25 @@ public class ConversionHandler {
         Mono<ConversionResponse> responseMono = conversionRequestMono
                 .flatMap(conversionRequest -> this.clients.get(1).getConversion(conversionRequest)
                         .onErrorResume(error -> Mono.empty())
-                        .switchIfEmpty(Mono.defer(() -> this.clients.get(0).getConversion(conversionRequest))));
+                        .switchIfEmpty(Mono.defer(() -> this.clients.get(0).getConversion(conversionRequest)
+                                .onErrorResume(error -> Mono.empty())
+                                .defaultIfEmpty(new ConversionResponse("invalidOne", null, null, null)))));
 
-        return ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(responseMono, ConversionResponse.class);
+        return responseMono.flatMap(conversionResponse -> {
+            if (conversionResponse != null && !conversionResponse.getFrom().equals("invalidOne")) {
+                return ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(conversionResponse);
+            } else {
+                return ServerResponse
+                        .status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(
+                                new ErrorConversionResponse("unsuccessful",
+                                        "there are no providers available"));
+            }
+        });
     }
 
 }
