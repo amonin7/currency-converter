@@ -28,15 +28,17 @@ public class ConversionRateGetterClientDotCom implements ConversionRateGetterCli
                 .onStatus(HttpStatus::isError,
                         clientResponse -> Mono.error(new InvalidClientException()))
                 .bodyToMono(ExternalProviderResponseEntity.class)
-                .flatMap(entity -> {
-                    if (!entity.getResult().equals("success")) {
-                        return Mono.error(new InvalidClientException());
-                    } else {
-                        return Mono.just(entity);
-                    }
-                });
+                .flatMap(this::validateEntity);
 
         return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
+    }
+
+    public Mono<ExternalProviderResponseEntity> validateEntity(ExternalProviderResponseEntity entity) {
+        if (!entity.getResult().equals("success")) {
+            return Mono.error(new InvalidClientException());
+        } else {
+            return Mono.just(entity);
+        }
     }
 
 }

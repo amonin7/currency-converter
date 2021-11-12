@@ -7,7 +7,6 @@ import com.onlym.converter.model.ExternalProviderResponseEntity;
 import com.onlym.converter.service.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -34,15 +33,17 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
                 .onStatus(HttpStatus::isError,
                         clientResponse -> Mono.error(new InvalidClientException()))
                 .bodyToMono(ExternalProviderResponseEntity.class)
-                .flatMap(entity -> {
-                    if (!entity.isSuccess()) {
-                        return Mono.error(new InvalidClientException());
-                    } else {
-                        return Mono.just(entity);
-                    }
-                });
+                .flatMap(this::validateEntity);
 
         return ConversionService.convertFromMono(conversionRequest, externalProviderResponseEntity);
+    }
+
+    public Mono<ExternalProviderResponseEntity> validateEntity(ExternalProviderResponseEntity entity) {
+        if (!entity.isSuccess()) {
+            return Mono.error(new InvalidClientException());
+        } else {
+            return Mono.just(entity);
+        }
     }
 
 }
