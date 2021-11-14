@@ -30,9 +30,9 @@ public class ConversionHandler {
         int clientIndex = rand.nextInt(2);
         Mono<ConversionRequest> conversionRequestMono = request.bodyToMono(ConversionRequest.class);
         Mono<ConversionResponse> responseMono = conversionRequestMono
-                .flatMap(conversionRequest -> this.clients.get(1).getConversion(conversionRequest)
+                .flatMap(conversionRequest -> this.clients.get(clientIndex).getConversion(conversionRequest)
                         .onErrorResume(error -> Mono.empty())
-                        .switchIfEmpty(Mono.defer(() -> this.clients.get(0).getConversion(conversionRequest)
+                        .switchIfEmpty(Mono.defer(() -> this.clients.get(1 - clientIndex).getConversion(conversionRequest)
                                 .onErrorResume(error -> Mono.empty())
                                 .defaultIfEmpty(new ConversionResponse("invalidOne", null, null, null)))));
 
