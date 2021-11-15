@@ -1,6 +1,11 @@
-# currency-converter
+# Currency converter
 ## Summary
 This is a reactive REST endpoint to handle the currency conversion.
+
+## Details
+The REST endpoint responds to a POST request to the URI `/currency/convert` with a body of type `ConversionRequest`, that will contain three fields: `from`, `to`, `amount`.
+
+The fields `from` and `to` are three-letter strings representing the currencies, like USD or EUR and `amount` field contains the decimal number, representing the quantity to be converted, e.g. 123.45.
 
 ## Example
 
