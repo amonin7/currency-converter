@@ -14,13 +14,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class ConversionRateGetterClientDotIo implements ConversionRateGetterClient {
 
+    public static final String BASE_URL = "http://api.exchangeratesapi.io";
     private final WebClient client;
 
     @Value("${dotioclient.access_key}")
     private String API_KEY;
 
-    public ConversionRateGetterClientDotIo(WebClient.Builder builder) {
-        this.client = builder.baseUrl("http://api.exchangeratesapi.io").build();
+    public ConversionRateGetterClientDotIo() {
+        this.client = WebClient.create(BASE_URL);
     }
 
     public Mono<ConversionResponse> getConversion(ConversionRequest conversionRequest) throws InvalidClientException {
@@ -28,7 +29,7 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
                 .get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")
                         .queryParam("access_key", API_KEY)
-                        .queryParam("base", "EUR")
+                        .queryParam("base", conversionRequest.getFrom())
                         .build())
                 .retrieve()
                 .onStatus(HttpStatus::isError,
@@ -45,6 +46,10 @@ public class ConversionRateGetterClientDotIo implements ConversionRateGetterClie
         } else {
             return Mono.just(entity);
         }
+    }
+
+    public void setAPI_KEY(String API_KEY) {
+        this.API_KEY = API_KEY;
     }
 
 }

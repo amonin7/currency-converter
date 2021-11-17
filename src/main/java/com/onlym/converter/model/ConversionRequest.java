@@ -12,9 +12,6 @@ public class ConversionRequest {
         this.amount = amount;
     }
 
-//    public ConversionRequest() {
-//    }
-
     public String getFrom() {
         return from;
     }

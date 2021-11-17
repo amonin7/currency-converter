@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-public class ConversionHandlerTest {
+public class End2EndConversionTest {
 
     public static final String FROM = "EUR";
     public static final String TO = "USD";
