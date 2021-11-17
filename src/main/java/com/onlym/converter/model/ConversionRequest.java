@@ -12,8 +12,8 @@ public class ConversionRequest {
         this.amount = amount;
     }
 
-    public ConversionRequest() {
-    }
+//    public ConversionRequest() {
+//    }
 
     public String getFrom() {
         return from;
@@ -37,5 +37,14 @@ public class ConversionRequest {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return "ConversionRequest{" +
+                "from='" + from + '\'' +
+                ", to='" + to + '\'' +
+                ", amount=" + amount +
+                '}';
     }
 }

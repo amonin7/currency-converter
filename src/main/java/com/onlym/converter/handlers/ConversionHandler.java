@@ -19,6 +19,8 @@ import java.util.Random;
 @Component
 public class ConversionHandler {
 
+    public static final ConversionRequest DEFAULT_INVALID_CONVERSION_REQUEST = new ConversionRequest("invalidOne", null, null);
+    public static final ConversionResponse DEFAULT_INVALID_CONVERSION_RESPONSE = new ConversionResponse("invalidOne", null, null, null);
     private final List<ConversionRateGetterClient> clients;
     private final Random rand = new Random();
 
@@ -30,11 +32,16 @@ public class ConversionHandler {
         int clientIndex = rand.nextInt(2);
         Mono<ConversionRequest> conversionRequestMono = request.bodyToMono(ConversionRequest.class);
         Mono<ConversionResponse> responseMono = conversionRequestMono
-                .flatMap(conversionRequest -> this.clients.get(clientIndex).getConversion(conversionRequest)
-                        .onErrorResume(error -> Mono.empty())
-                        .switchIfEmpty(Mono.defer(() -> this.clients.get(1 - clientIndex).getConversion(conversionRequest)
-                                .onErrorResume(error -> Mono.empty())
-                                .defaultIfEmpty(new ConversionResponse("invalidOne", null, null, null)))));
+                .flatMap(conversionRequest -> {
+                    if (conversionRequest == null) {
+                        return Mono.just(DEFAULT_INVALID_CONVERSION_RESPONSE);
+                    }
+                    return this.clients.get(clientIndex).getConversion(conversionRequest)
+                            .onErrorResume(error -> Mono.empty())
+                            .switchIfEmpty(Mono.defer(() -> this.clients.get(1 - clientIndex).getConversion(conversionRequest)
+                                    .onErrorResume(error -> Mono.empty())
+                                    .defaultIfEmpty(DEFAULT_INVALID_CONVERSION_RESPONSE)));
+                });
 
         return responseMono.flatMap(conversionResponse -> {
             if (conversionResponse != null && !conversionResponse.getFrom().equals("invalidOne")) {
@@ -50,7 +57,14 @@ public class ConversionHandler {
                                 new ErrorConversionResponse("unsuccessful",
                                         "there are no providers available"));
             }
-        });
+        })
+                .switchIfEmpty(ServerResponse
+                        .status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(new ErrorConversionResponse(
+                                "unsuccessful",
+                                "you provided the empty body"
+                        )));
     }
 
 }

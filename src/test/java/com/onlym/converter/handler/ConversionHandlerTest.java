@@ -2,12 +2,14 @@ package com.onlym.converter.handler;
 
 import com.onlym.converter.model.ConversionRequest;
 import com.onlym.converter.model.ConversionResponse;
+import com.onlym.converter.model.ErrorConversionResponse;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -58,7 +60,7 @@ public class ConversionHandlerTest {
         WebTestClient webTestClient;
 
         @Test
-        public void standardConversion() {
+        public void dotioClientAuthFailConversion() {
             webTestClient
                     .post()
                     .uri("/currency/convert")
@@ -71,6 +73,44 @@ public class ConversionHandlerTest {
                         ConversionResponse conversionResponse = response.getResponseBody();
                         assertCorrectConversionResponse(conversionResponse);
                     });
+        }
+
+        @Test
+        public void wrongRequestFailConversion() {
+            webTestClient
+                    .post()
+                    .uri("/currency/convert")
+                    .bodyValue(new ConversionRequest("EUF", TO, AMOUNT))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isEqualTo(HttpStatus.SERVICE_UNAVAILABLE)
+                    .expectBody(ErrorConversionResponse.class)
+                    .consumeWith((response) -> {
+                        ErrorConversionResponse errorConversionResponse = response.getResponseBody();
+                        assertCorrectErrorConversionResponse(errorConversionResponse);
+                        assertEquals("there are no providers available", errorConversionResponse.getMessage());
+                    });
+        }
+
+        @Test
+        public void emptyBodyFailConversion() {
+            webTestClient
+                    .post()
+                    .uri("/currency/convert")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST)
+                    .expectBody(ErrorConversionResponse.class)
+                    .consumeWith((response) -> {
+                        ErrorConversionResponse errorConversionResponse = response.getResponseBody();
+                        assertCorrectErrorConversionResponse(errorConversionResponse);
+                        assertEquals("you provided the empty body", errorConversionResponse.getMessage());
+                    });
+        }
+
+        private void assertCorrectErrorConversionResponse(ErrorConversionResponse errorConversionResponse) {
+            assertNotNull(errorConversionResponse);
+            assertEquals("unsuccessful", errorConversionResponse.getResult());
         }
     }
 
