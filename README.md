@@ -2,6 +2,19 @@
 ## Summary
 This is a reactive REST endpoint to handle the currency conversion.
 
+## Installation (running) guide
+1. Create `application.properties` file in `src/main/resources` directory
+2. Add the property `dotioclient.access_key` and assign it with access key for the `http://api.exchangeratesapi.io` API. \
+In simple case your `application.properties` should look like this:
+```properties
+dotioclient.access_key=your_own_access_key
+```
+3a. Build and run the app using one of the following commands (just run in terminal from the project directory):
+- `gradle clean build bootRun`
+- `./gradlew clean build bootRun`
+
+3b. If you use IDE and just imported the project - you need to run the `src/main/java/com/onlym/converter/ConverterApplication.java` _psvm_ method by clicking the "play" / "run" button next to it.
+
 ## Details
 The REST endpoint responds to a POST request to the URI `/currency/convert` with a body of type `ConversionRequest`, that will contain three fields: `from`, `to`, `amount`.
 
