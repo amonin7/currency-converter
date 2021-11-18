@@ -2,13 +2,10 @@ package com.onlym.converter.model;
 
 public class ConversionResponse {
 
-    private String from;
-    private String to;
-    private Double amount;
-    private Double converted;
-
-    public ConversionResponse() {
-    }
+    private final String from;
+    private final String to;
+    private final Double amount;
+    private final Double converted;
 
     public ConversionResponse(String from, String to, Double amount, Double converted) {
         this.from = from;
@@ -29,31 +26,15 @@ public class ConversionResponse {
                 converted);
     }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
     public String getTo() {
         return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
     }
 
     public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
     public Double getConverted() {
         return converted;
-    }
-
-    public void setConverted(Double converted) {
-        this.converted = converted;
     }
 }
