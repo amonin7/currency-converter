@@ -20,13 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class ConversionRateGetterClientDotIoTest {
-
+public class ConversionRateGetterClientDotComTest {
     public static final String FROM = "EUR";
     public static final String TO = "USD";
     public static final double AMOUNT = 123.45;
     @Autowired
-    private ConversionRateGetterClientDotIo TOT;
+    private ConversionRateGetterClientDotCom TOT;
 
     @Nested
     class ValidateEntityTest {
@@ -35,7 +34,8 @@ public class ConversionRateGetterClientDotIoTest {
         public void validateSuccessTest() {
             assertNotNull(TOT);
             ExternalProviderResponseEntity entity =
-                    new ExternalProviderResponseEntity("base", "date", new HashMap<>(), null, true);
+                    new ExternalProviderResponseEntity(
+                            "base", "date", new HashMap<>(), "success", true);
             Mono<ExternalProviderResponseEntity> validatedMono = TOT.validateEntity(entity);
             StepVerifier.create(validatedMono)
                     .consumeNextWith((validatedEntity) -> assertEquals(entity, validatedEntity))
@@ -45,7 +45,8 @@ public class ConversionRateGetterClientDotIoTest {
         @Test
         public void validateUnSuccessTest() {
             ExternalProviderResponseEntity entity =
-                    new ExternalProviderResponseEntity("base", "date", new HashMap<>(), null, false);
+                    new ExternalProviderResponseEntity(
+                            "base", "date", new HashMap<>(), "unsuccessful", false);
             Mono<ExternalProviderResponseEntity> validatedMono = TOT.validateEntity(entity);
             verifyErrorMono(validatedMono);
         }
@@ -70,16 +71,6 @@ public class ConversionRateGetterClientDotIoTest {
         }
 
         @Nested
-        class WrongAuthTest {
-            @Test
-            public void wrongAuthErrorCatching() {
-                TOT.setAPI_KEY("wrong_api_key");
-                Mono<ConversionResponse> responseMono = TOT.getConversion(new ConversionRequest(FROM, TO, AMOUNT));
-                verifyErrorMono(responseMono);
-            }
-        }
-
-        @Nested
         class WrongCurrencyTest {
             @Test
             public void wrongCurrencyErrorCatching() {
@@ -95,4 +86,5 @@ public class ConversionRateGetterClientDotIoTest {
                 .expectError(InvalidClientException.class)
                 .verify();
     }
+
 }
