@@ -44,7 +44,7 @@ and a conversion rate of `1.1` from EUR to USD (obtained from the external provi
   "from": "EUR",
   "to": "USD",
   "amount": 123.45,
-  "converted": 135.78
+  "converted": 135.8
 }
 ```
 where `135.78` is the result of `123.45 * 1.1`, amount times the conversion rate.

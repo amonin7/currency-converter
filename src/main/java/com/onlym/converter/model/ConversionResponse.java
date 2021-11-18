@@ -21,12 +21,12 @@ public class ConversionResponse {
         return from;
     }
 
-    public static ConversionResponse from(ConversionRequest request, Double rate) {
+    public static ConversionResponse from(ConversionRequest request, Double converted) {
         return new ConversionResponse(
                 request.getFrom(),
                 request.getTo(),
                 request.getAmount(),
-                request.getAmount() * rate);
+                converted);
     }
 
     public void setFrom(String from) {
